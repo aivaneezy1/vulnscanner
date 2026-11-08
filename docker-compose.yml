@@ -1,0 +1,10 @@
+services:
+  vulnscan:
+    build: .
+    image: vulnscan:latest
+    container_name: vulnscan
+    ports:
+      - "${HOST_PORT:-8000}:${PORT:-8000}"
+    environment:
+      - PORT=${PORT:-8000}
+    restart: unless-stopped

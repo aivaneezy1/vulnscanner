@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auth-Aware Vulnerability Scanner</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>🛡️ Self-Hosted Vulnerability Scanner</h1>
+    <div class="disclaimer">
+      ⚠️ Only scan systems you own or have written permission to test.
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <section class="panel config-panel">
+      <h2>Scan Configuration</h2>
+      <form id="scan-form">
+
+        <label for="target_url">Target URL</label>
+        <input type="text" id="target_url" name="target_url" placeholder="https://example.com" />
+
+        <fieldset class="mode-select">
+          <legend>Scan mode</legend>
+          <label class="radio-label">
+            <input type="radio" name="mode" value="unauthenticated" checked />
+            Unauthenticated scan
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="mode" value="authenticated" />
+            Authenticated scan
+          </label>
+        </fieldset>
+
+        <div id="auth-panel" class="auth-panel hidden">
+
+          <div class="sub-mode-select">
+            <label class="radio-label">
+              <input type="radio" name="auth_mode" value="form" checked />
+              Form Login
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="auth_mode" value="manual" />
+              Manual Session Import
+            </label>
+          </div>
+
+          <div id="form-login-fields">
+            <label for="login_url">Login URL</label>
+            <input type="text" id="login_url" placeholder="https://example.com/login" />
+
+            <div class="two-col">
+              <div>
+                <label for="username">Username</label>
+                <input type="text" id="username" autocomplete="off" />
+              </div>
+              <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" autocomplete="off" />
+              </div>
+            </div>
+
+            <details class="collapsible">
+              <summary>Advanced: custom selectors &amp; extra fields</summary>
+              <div class="collapsible-body">
+                <label for="username_selector">Username field CSS selector (optional)</label>
+                <input type="text" id="username_selector" placeholder="#login-email" />
+
+                <label for="password_selector">Password field CSS selector (optional)</label>
+                <input type="text" id="password_selector" placeholder="#login-password" />
+
+                <label for="submit_selector">Submit button CSS selector (optional)</label>
+                <input type="text" id="submit_selector" placeholder="button#submit" />
+
+                <label for="extra_fields">Extra form fields, one per line (name=value)</label>
+                <textarea id="extra_fields" rows="3" placeholder="csrf_token=abc123"></textarea>
+              </div>
+            </details>
+
+            <button type="button" id="test-login-btn">Test Login</button>
+            <span id="test-login-result" class="test-result"></span>
+          </div>
+
+          <details class="collapsible" id="manual-session-panel">
+            <summary>Advanced: Manual Session</summary>
+            <div class="collapsible-body">
+              <label for="manual_session">Paste a Cookie header, JSON cookie export, or
+                <code>Authorization: Bearer &lt;token&gt;</code></label>
+              <textarea id="manual_session" rows="5"
+                placeholder="Cookie: session=abc123; other=xyz&#10;&#10;or&#10;&#10;Authorization: Bearer eyJhbGciOi..."></textarea>
+            </div>
+          </details>
+
+        </div>
+
+        <label for="urls_to_scan">URLs to scan (one per line — paste the specific protected pages)</label>
+        <textarea id="urls_to_scan" rows="4" placeholder="https://example.com/dashboard?id=1
+https://example.com/account/settings"></textarea>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="also_crawl" />
+          Also crawl links from the target URL
+        </label>
+
+        <button type="submit" id="start-scan-btn">Start Scan</button>
+      </form>
+    </section>
+
+    <section class="panel results-panel">
+      <h2>Scan Status</h2>
+      <div class="status-bar">
+        <div id="stage-label" class="stage-label">Idle</div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+      <div id="errors-box" class="errors-box hidden"></div>
+
+      <h3>Results</h3>
+      <div class="table-wrap">
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>Severity</th>
+              <th>Vulnerability Type</th>
+              <th>URL</th>
+              <th>Parameter</th>
+              <th>Payload</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
+          <tbody id="results-body">
+            <tr class="empty-row"><td colspan="6">No results yet. Configure a scan and click "Start Scan".</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
